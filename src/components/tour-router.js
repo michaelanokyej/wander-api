@@ -8,6 +8,7 @@ const tourService = require("./tour-service");
 const { getTourValidationError } = require('./tour-validator');
 
 const serializetour = tour => ({
+  id: xss(tour.id),
   name: xss(tour.name),
   city: xss(tour.city),
   state: xss(tour.state),
@@ -16,7 +17,8 @@ const serializetour = tour => ({
   max_tourists: xss(tour.max_tourists),
   policies: xss(tour.policies),
   guide_username: xss(tour.guide_username),
-  guide_id: xss(tour.guide_id)
+  guide_id: xss(tour.guide_id),
+  posted: xss(tour.posted)
 })
 
 tourRouter
