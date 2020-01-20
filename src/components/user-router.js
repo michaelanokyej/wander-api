@@ -8,11 +8,11 @@ const userService = require("./user-service");
 const { getUserValidationError } = require('./user-validator');
 
 const serializeuser = user => ({
+  id: user.id,
   f_name: xss(user.f_name),
   l_name: xss(user.l_name),
   email: xss(user.email),
   password: xss(user.password),
-  confirm_password: xss(user.confirm_password)
 })
 
 userRouter
@@ -49,7 +49,7 @@ userRouter
       newUser
     )
       .then(user => {
-        console.log(user)
+        console.log("Posted user", user)
         logger.info(`user with id ${user.id} created.`)
         res
           .status(201)
@@ -87,7 +87,7 @@ userRouter
 
   .delete((req, res, next) => {
     const { user_id } = req.params
-    userService.deleteuser(
+    userService.deleteUser(
       req.app.get('db'),
       user_id
     )

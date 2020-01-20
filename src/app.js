@@ -6,8 +6,7 @@ const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
 const errorHandler = require('./error-handler');
 const userRouter = require('./components/user-router');
-
-
+const tourRouter = require('./components/tour-router');
 
 const app = express();
 
@@ -21,7 +20,7 @@ app.use(helmet());
 app.use(cors());
 
 app.use('/api/users', userRouter)
-// app.use('/api/tours', tourRouter)
+app.use('/api/tours', tourRouter)
 
 app.get("/", (req, res) => {
   res.send("Hello, world!");
