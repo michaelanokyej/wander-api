@@ -53,13 +53,13 @@ userRouter
         logger.info(`user with id ${user.id} created.`)
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `/${user.id}`))
+          // .location(path.posix.join(req.originalUrl, `/${user.id}`))
           .json(serializeuser(user))
       })
       .catch(next)
   })
 
-
+// Create a route to the /user_email endpoint 
 userRouter
   .route('/:user_id')
 
