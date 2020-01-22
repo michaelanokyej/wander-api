@@ -60,6 +60,30 @@ userRouter
   })
 
 // Create a route to the /user_email endpoint 
+// userRouter
+//   .route('/:user_email')
+
+//   .all((req, res, next) => {
+//     const { user_email } = req.params
+//     userService.getByGuideUsername(req.app.get('db'), user_email)
+//       .then(user => {
+//         if (!user) {
+//           logger.error(`user with username ${user_email} not found.`)
+//           return res.status(404).json({
+//             error: { message: `user Not Found` }
+//           })
+//         }
+
+//         res.user = user
+//         next()
+//       })
+//       .catch(next)
+
+//   })
+//   .get((req, res) => {
+//     res.json(serializeuser(res.user))
+//   })
+
 userRouter
   .route('/:user_id')
 

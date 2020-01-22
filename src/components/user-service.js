@@ -14,6 +14,9 @@ const userService = {
   getById(knex, id) {
      return knex.from('users').select('*').where('id', id).first()
    },
+   getByGuideUsername(knex, GuideUsername) {
+    return knex.from('users').select('*').where('email', GuideUsername).first()
+  },
   deleteUser(knex, id) {
      return knex('users')
       .where({ id })
