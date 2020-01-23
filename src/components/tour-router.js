@@ -104,7 +104,7 @@ tourRouter
 
   .delete((req, res, next) => {
     const { tour_id } = req.params
-    tourService.deletetour(
+    tourService.deleteTour(
       req.app.get('db'),
       tour_id
     )
