@@ -6,6 +6,8 @@ const bodyParser = express.json();
 const logger = require("../logger");
 const userService = require("./user-service");
 const { getUserValidationError } = require('./user-validator');
+const jwt = require('jsonwebtoken');
+
 
 const serializeuser = user => ({
   id: user.id,
@@ -59,29 +61,21 @@ userRouter
       .catch(next)
   })
 
-// Create a route to the /user_email endpoint 
-// userRouter
-//   .route('/:user_email')
+// Create a route for auth 
+// authRouter
+//   .route('/login')
 
-//   .all((req, res, next) => {
-//     const { user_email } = req.params
-//     userService.getByGuideUsername(req.app.get('db'), user_email)
-//       .then(user => {
-//         if (!user) {
-//           logger.error(`user with username ${user_email} not found.`)
-//           return res.status(404).json({
-//             error: { message: `user Not Found` }
-//           })
-//         }
+//   .post(bodyParser, verifyToken, (req, res, next) => {
+//     const { email, password } = req.body
+//     const user = { email, password }
 
-//         res.user = user
-//         next()
+//     jwt.sign({user}, 'secretkey', (err, token) => {
+//       res.json({
+//         token
 //       })
-//       .catch(next)
+//     })
 
-//   })
-//   .get((req, res) => {
-//     res.json(serializeuser(res.user))
+
 //   })
 
 userRouter

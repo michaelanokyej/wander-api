@@ -55,10 +55,10 @@ tourRouter
       newtour.guide_username
     )
       .then(guide => {
-        console.log(guide)
+        // console.log(guide)
         const guideId = guide.id
         newtour.guide_id = guideId;
-        console.log("updated tour", newtour)
+        // console.log("updated tour", newtour)
         return newtour;
       }).then(newtour => {
     tourService.insertTour(
@@ -66,7 +66,7 @@ tourRouter
       newtour
     )
       .then(tour => {
-        console.log("Posted tour", tour)
+        // console.log("Posted tour", tour)
         logger.info(`tour with id ${tour.id} created.`)
         res
           .status(201)
