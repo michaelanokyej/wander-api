@@ -11,13 +11,53 @@ const jwt = require('jsonwebtoken');
 
 const serializeauth = auth => ({
   id: auth.id,
-  f_name: xss(auth.f_name),
-  l_name: xss(auth.l_name),
-  email: xss(auth.email),
-  password: xss(auth.password),
+  firstName: xss(auth.f_name),
+  lastName: xss(auth.l_name),
+  userName: xss(auth.email),
+  // password: xss(auth.password),
 })
 
+authRouter
+  .route('/')
 
+  .post(bodyParser, (req, res, next) => {
+    const { userName } = req.body
+    const user = { userName }
+    // console.log(user)
+
+    for (const field of [ 'userName' ]) {
+      if (!user[field]) {
+        logger.error(`${field} is required`)
+        return res.status(400).send({
+          error: { message: `'${field}' is required` }
+        })
+      }
+    }
+
+    // const error = getAuthValidationError(user)
+
+
+    // if (error) return res.status(400).send(error)
+
+    userService.getByGuideUsername (
+      req.app.get('db'),
+      user.userName
+    )
+      .then(verifiedUser => {
+        res.json(serializeauth(verifiedUser))
+        // console.log("loggen in user", serializeauth(verifiedUser))
+
+      })
+      // .then(tour => {
+      //   // console.log("Posted tour", tour)
+      //   logger.info(`tour with id ${tour.id} created.`)
+      //   res
+      //     .status(201)
+      //     .location(path.posix.join(req.originalUrl, `/${tour.id}`))
+      //     .json(serializetour(tour))
+      // })
+      .catch(next)
+    })
 
 authRouter
   .route('/login')
@@ -45,7 +85,7 @@ authRouter
       user.email
     )
       .then(verifiedUser => {
-        console.log("res line 48", res)
+        // console.log("res line 48", res)
         if (verifiedUser.password !== user.password) {
           res.send('Err: User not found, please verify password')
         }

@@ -51,7 +51,7 @@ userRouter
       newUser
     )
       .then(user => {
-        console.log("Posted user", user)
+        // console.log("Posted user", user)
         logger.info(`user with id ${user.id} created.`)
         res
           .status(201)
