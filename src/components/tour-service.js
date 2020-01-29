@@ -17,6 +17,9 @@ const tourService = {
   getById(knex, id) {
      return knex.from('tours').select('*').where('id', id).first()
    },
+  getBySearchTerm(knex, city, state) {
+    return knex.from('tours').select('*').where('city','ilike', `%${city}%`).andWhere('state','ilike', `%${state}%`)
+  } ,
   deleteTour(knex, id) {
      return knex('tours')
       .where({ id })

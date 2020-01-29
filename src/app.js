@@ -8,6 +8,7 @@ const errorHandler = require('./error-handler');
 const userRouter = require('./components/user-router');
 const tourRouter = require('./components/tour-router');
 const authRouter = require('./components/auth-router');
+const searchRouter = require('./components/search-router');
 // const jwt = require('jsonwebtoken');
 
 const app = express();
@@ -23,6 +24,7 @@ app.use(cors());
 
 app.use('/api/users', userRouter)
 app.use('/api/tours', tourRouter)
+app.use('/api/search', searchRouter)
 app.use('/api/auth', authRouter)
 
 app.get("/", (req, res) => {
