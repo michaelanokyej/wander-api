@@ -1,32 +1,40 @@
 const userService = {
   getAllUsers(knex) {
-    return knex.select('*').from('users')
-       },
+    return knex.select("*").from("users");
+  },
   insertUser(knex, newUser) {
     return knex
-    .insert(newUser)
-    .into('users')
-    .returning('*')
-    .then(rows => {
-      return rows[0]
-    })
+      .insert(newUser)
+      .into("users")
+      .returning("*")
+      .then(rows => {
+        return rows[0];
+      });
   },
   getById(knex, id) {
-     return knex.from('users').select('*').where('id', id).first()
-   },
-   getByGuideUsername(knex, GuideUsername) {
-    return knex.from('users').select('*').where('email', GuideUsername).first()
+    return knex
+      .from("users")
+      .select("*")
+      .where("id", id)
+      .first();
+  },
+  getByGuideUsername(knex, GuideUsername) {
+    return knex
+      .from("users")
+      .select("*")
+      .where("email", GuideUsername)
+      .first();
   },
   deleteUser(knex, id) {
-     return knex('users')
+    return knex("users")
       .where({ id })
-      .delete()
+      .delete();
   },
   updateUser(knex, id, newUserFields) {
-    return knex('users')
-     .where({ id })
-     .update(newUserFields)
+    return knex("users")
+      .where({ id })
+      .update(newUserFields);
   }
-}
+};
 
-module.exports = userService
+module.exports = userService;

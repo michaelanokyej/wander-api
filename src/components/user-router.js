@@ -1,150 +1,118 @@
 const express = require("express");
-const path = require('path')
-const xss = require('xss')
+const path = require("path");
+const xss = require("xss");
 const userRouter = express.Router();
 const bodyParser = express.json();
 const logger = require("../logger");
 const userService = require("./user-service");
-const { getUserValidationError } = require('./user-validator');
-const jwt = require('jsonwebtoken');
-
+const { getUserValidationError } = require("./user-validator");
+const jwt = require("jsonwebtoken");
 
 const serializeuser = user => ({
   id: user.id,
   f_name: xss(user.f_name),
   l_name: xss(user.l_name),
   email: xss(user.email),
-  password: xss(user.password),
-})
+  password: xss(user.password)
+});
 
 userRouter
-  .route('/')
+  .route("/")
 
   .get((req, res, next) => {
-    userService.getAllUsers(req.app.get('db'))
+    userService
+      .getAllUsers(req.app.get("db"))
       .then(users => {
-        res.json(users.map(serializeuser))
+        res.json(users.map(serializeuser));
       })
-      .catch(next)
+      .catch(next);
   })
-  // Ask about unauthorized request and how to use set for tokens 
-
   .post(bodyParser, (req, res, next) => {
-    const { f_name, l_name, email, password } = req.body
-    const newUser = { f_name, l_name, email, password }
+    const { f_name, l_name, email, password } = req.body;
+    const newUser = { f_name, l_name, email, password };
 
-    for (const field of ['f_name', 'l_name', 'email', 'password']) {
+    for (const field of ["f_name", "l_name", "email", "password"]) {
       if (!newUser[field]) {
-        logger.error(`${field} is required`)
+        logger.error(`${field} is required`);
         return res.status(400).send({
           error: { message: `'${field}' is required` }
-        })
+        });
       }
     }
 
-    const error = getUserValidationError(newUser)
+    const error = getUserValidationError(newUser);
 
-    if (error) return res.status(400).send(error)
+    if (error) return res.status(400).send(error);
 
-    userService.insertUser(
-      req.app.get('db'),
-      newUser
-    )
+    userService
+      .insertUser(req.app.get("db"), newUser)
       .then(user => {
-        // console.log("Posted user", user)
-        logger.info(`user with id ${user.id} created.`)
-        res
-          .status(201)
-          // .location(path.posix.join(req.originalUrl, `/${user.id}`))
-          .json(serializeuser(user))
+        logger.info(`user with id ${user.id} created.`);
+        res.status(201).json(serializeuser(user));
       })
-      .catch(next)
-  })
-
-// Create a route for auth 
-// authRouter
-//   .route('/login')
-
-//   .post(bodyParser, verifyToken, (req, res, next) => {
-//     const { email, password } = req.body
-//     const user = { email, password }
-
-//     jwt.sign({user}, 'secretkey', (err, token) => {
-//       res.json({
-//         token
-//       })
-//     })
-
-
-//   })
+      .catch(next);
+  });
 
 userRouter
-  .route('/:user_id')
+  .route("/:user_id")
 
   .all((req, res, next) => {
-    const { user_id } = req.params
-    userService.getById(req.app.get('db'), user_id)
+    const { user_id } = req.params;
+    userService
+      .getById(req.app.get("db"), user_id)
       .then(user => {
         if (!user) {
-          logger.error(`user with id ${user_id} not found.`)
+          logger.error(`user with id ${user_id} not found.`);
           return res.status(404).json({
             error: { message: `user Not Found` }
-          })
+          });
         }
 
-        res.user = user
-        next()
+        res.user = user;
+        next();
       })
-      .catch(next)
-
+      .catch(next);
   })
 
   .get((req, res) => {
-    res.json(serializeuser(res.user))
+    res.json(serializeuser(res.user));
   })
 
   .delete((req, res, next) => {
-    const { user_id } = req.params
-    userService.deleteUser(
-      req.app.get('db'),
-      user_id
-    )
+    const { user_id } = req.params;
+    userService
+      .deleteUser(req.app.get("db"), user_id)
       .then(numRowsAffected => {
-        logger.info(`user with id ${user_id} deleted.`)
-        res.status(204).end()
+        logger.info(`user with id ${user_id} deleted.`);
+        res.status(204).end();
       })
-      .catch(next)
+      .catch(next);
   })
 
   .patch(bodyParser, (req, res, next) => {
-    const { f_name, l_name, email, password } = req.body
-    const userToUpdate = { f_name, l_name, email, password }
+    const { f_name, l_name, email, password } = req.body;
+    const userToUpdate = { f_name, l_name, email, password };
 
-    const numberOfValues = Object.values(userToUpdate).filter(Boolean).length
+    const numberOfValues = Object.values(userToUpdate).filter(Boolean).length;
     if (numberOfValues === 0) {
-      logger.error(`Invalid update without required fields`)
+      logger.error(`Invalid update without required fields`);
       return res.status(400).json({
         error: {
           message: `Request body must content either 'user_name', 'folder_id', or 'content'`
         }
-      })
+      });
     }
 
-    const error = getUserValidationError(userToUpdate)
+    const error = getUserValidationError(userToUpdate);
 
-    
+    if (error) return res.status(400).send(error);
 
-    if (error) return res.status(400).send(error)
-
-    userService.updateUser(
-      req.app.get('db'),
-      req.params.user_id,
-      userToUpdate
-    )
+    userService
+      .updateUser(req.app.get("db"), req.params.user_id, userToUpdate)
       .then(numRowsAffected => {
-        res.status(204).end()
+        res.status(204).end();
       })
-      .catch(next)
-  })
+      .catch(next);
+  });
 
 module.exports = userRouter;

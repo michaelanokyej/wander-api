@@ -1,141 +1,91 @@
 const express = require("express");
-const path = require('path')
-const xss = require('xss')
+const path = require("path");
+const xss = require("xss");
 const authRouter = express.Router();
 const bodyParser = express.json();
 const logger = require("../logger");
-// const authService = require("./auth-service");
 const userService = require("./user-service");
-const { getAuthValidationError } = require('./auth-validator');
-const jwt = require('jsonwebtoken');
+const { getAuthValidationError } = require("./auth-validator");
+const jwt = require("jsonwebtoken");
 
 const serializeauth = auth => ({
   id: auth.id,
   firstName: xss(auth.f_name),
   lastName: xss(auth.l_name),
-  userName: xss(auth.email),
-  // password: xss(auth.password),
-})
+  userName: xss(auth.email)
+});
 
 authRouter
-  .route('/')
+  .route("/")
 
   .post(bodyParser, (req, res, next) => {
-    const { userName } = req.body
-    const user = { userName }
-    // console.log(user)
+    const { userName } = req.body;
+    const user = { userName };
 
-    for (const field of [ 'userName' ]) {
+    for (const field of ["userName"]) {
       if (!user[field]) {
-        logger.error(`${field} is required`)
+        logger.error(`${field} is required`);
         return res.status(400).send({
           error: { message: `'${field}' is required` }
-        })
+        });
       }
     }
 
-    // const error = getAuthValidationError(user)
-
-
-    // if (error) return res.status(400).send(error)
-
-    userService.getByGuideUsername (
-      req.app.get('db'),
-      user.userName
-    )
+    userService
+      .getByGuideUsername(req.app.get("db"), user.userName)
       .then(verifiedUser => {
-        res.json(serializeauth(verifiedUser))
-        // console.log("loggen in user", serializeauth(verifiedUser))
-
+        res.json(serializeauth(verifiedUser));
       })
-      // .then(tour => {
-      //   // console.log("Posted tour", tour)
-      //   logger.info(`tour with id ${tour.id} created.`)
-      //   res
-      //     .status(201)
-      //     .location(path.posix.join(req.originalUrl, `/${tour.id}`))
-      //     .json(serializetour(tour))
-      // })
-      .catch(next)
-    })
+      .catch(next);
+  });
 
 authRouter
-  .route('/login')
+  .route("/login")
 
   .post(bodyParser, (req, res, next) => {
-    const { email, password } = req.body
-    const user = { email, password }
+    const { email, password } = req.body;
+    const user = { email, password };
 
-    for (const field of [ 'email', 'password' ]) {
+    for (const field of ["email", "password"]) {
       if (!user[field]) {
-        logger.error(`${field} is required`)
+        logger.error(`${field} is required`);
         return res.status(400).send({
           error: { message: `'${field}' is required` }
-        })
+        });
       }
     }
 
-    const error = getAuthValidationError(user)
+    const error = getAuthValidationError(user);
 
+    if (error) return res.status(400).send(error);
 
-    if (error) return res.status(400).send(error)
-
-    userService.getByGuideUsername (
-      req.app.get('db'),
-      user.email
-    )
+    userService
+      .getByGuideUsername(req.app.get("db"), user.email)
       .then(verifiedUser => {
-        // console.log("res line 48", res)
         if (verifiedUser.password !== user.password) {
-          res.send('Err: User not found, please verify password')
+          res.send("Err: User not found, please verify password");
         }
-      }).then(user => {
-        
-        jwt.sign({user}, 'secretkey', (err, token) => {
+      })
+      .then(user => {
+        jwt.sign({ user }, "secretkey", (err, token) => {
           res.json({
             token
-          })
-        })
-    // userService.insertTour(
-    //   req.app.get('db'),
-    //   newtour
+          });
+        });
       })
-      // .then(tour => {
-      //   // console.log("Posted tour", tour)
-      //   logger.info(`tour with id ${tour.id} created.`)
-      //   res
-      //     .status(201)
-      //     .location(path.posix.join(req.originalUrl, `/${tour.id}`))
-      //     .json(serializetour(tour))
-      // })
-      .catch(next)
-    })
+      .catch(next);
+  });
 
-    //Format of token
-    //Authorization: Bearer <access token>
+function verifyToken(req, res, next) {
+  const bearerHeader = req.headers["authorization"];
+  if (typeof bearerHeader !== "undefined") {
+    const bearer = bearerHeader.split(" ");
+    const bearerToken = bearer[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.sendStatus(403);
+  }
+}
 
-    // Verify token
-    function verifyToken(req, res, next) {
-      // Get auth header value 
-      const bearerHeader = req.headers['authorization'];
-      // check if bearer is undefined
-      // Check if bearer is undefined 
-      if (typeof bearerHeader !== 'undefined') {
-        // split at the space 
-        const bearer = bearerHeader.split(' ');
-        // Get token from array 
-        const bearerToken = bearer[1];
-        // set the token 
-        req.token = bearerToken;
-        // Set next middleware 
-        next()
-      
-      }else {
-        // Forbidden
-        res.sendStatus(403)
-      }
-    }
-
-
-
-  module.exports = authRouter;
+module.exports = authRouter;
