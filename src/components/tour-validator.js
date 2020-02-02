@@ -9,9 +9,11 @@ function getTourValidationError({
   img,
   description,
   policies,
-  guide_username
+  guide_username,
+  guide_email,
+  guide_id
 }) {
-  const include_flag = guide_username.split("").includes("@");
+  const include_flag = guide_email.split("").includes("@");
 
   if (!name) {
     logger.error(`Invalid  name '${name}' supplied`);
@@ -48,14 +50,32 @@ function getTourValidationError({
         message: `'Tour policies' must be entered`
       }
     };
-  } else if (!include_flag) {
-    logger.error(`Invalid guide_username '${guide_username}' supplied`);
+  }
+   else if (!include_flag) {
+    logger.error(`Invalid guide email '${guide_email}' supplied`);
     return {
       error: {
-        message: `'A valid guide_username' must be entered`
+        message: `'A valid guide' must be entered`
       }
     };
-  } else if (!description) {
+  } 
+  if (!guide_username) {
+    logger.error(`Invalid  guide username '${guide_username}' supplied`);
+    return {
+      error: {
+        message: `'guide username' must be entered`
+      }
+    };
+  }
+  if (!guide_id) {
+    logger.error(`Invalid  guide ID '${guide_id}' supplied`);
+    return {
+      error: {
+        message: `'guide ID' must be entered`
+      }
+    };
+  }
+  else if (!description) {
     logger.error(`Invalid tour description '${description}' supplied`);
     return {
       error: {

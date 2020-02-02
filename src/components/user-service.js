@@ -18,11 +18,18 @@ const userService = {
       .where("id", id)
       .first();
   },
-  getByGuideUsername(knex, GuideUsername) {
+  getByUsername(knex, username) {
     return knex
       .from("users")
       .select("*")
-      .where("email", GuideUsername)
+      .where("username", username)
+      .first();
+  },
+  getByUserEmail(knex, userEmail) {
+    return knex
+      .from("users")
+      .select("*")
+      .where("email", userEmail)
       .first();
   },
   deleteUser(knex, id) {

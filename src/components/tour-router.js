@@ -5,6 +5,7 @@ const tourRouter = express.Router();
 const bodyParser = express.json();
 const logger = require("../logger");
 const tourService = require("./tour-service");
+const guideService = require("./guide-service");
 const { getTourValidationError } = require("./tour-validator");
 
 const serializetour = tour => ({
@@ -17,9 +18,29 @@ const serializetour = tour => ({
   max_tourists: xss(tour.max_tourists),
   policies: xss(tour.policies),
   guide_username: xss(tour.guide_username),
+  guide_email: xss(tour.guide_email),
   guide_id: xss(tour.guide_id),
   posted: xss(tour.posted)
 });
+
+// let newtour = {
+//   name: "",
+//   city: "",
+//   state: "",
+//   img: "",
+//   description: "",
+//   max_tourists: "",
+//   policies: "",
+//   guide_username: "",
+//   guide_email: "",
+//   guide_id: ""
+// };
+
+// let newGuide = {
+//   username: "",
+//   email: "",
+//   primaryuserid: ""
+// }
 
 tourRouter
   .route("/")
@@ -42,9 +63,11 @@ tourRouter
       description,
       max_tourists,
       policies,
-      guide_username
+      guide_username,
+      guide_email,
+      guide_id
     } = req.body;
-    let newtour = {
+    const newtour = {
       name,
       city,
       state,
@@ -52,8 +75,16 @@ tourRouter
       description,
       max_tourists,
       policies,
-      guide_username
+      guide_username,
+      guide_email,
+      guide_id
     };
+
+    const newGuide = {
+      username: guide_username,
+      email: guide_email,
+      primaryuserid: guide_id
+    }
 
     for (const field of [
       "name",
@@ -63,7 +94,9 @@ tourRouter
       "description",
       "max_tourists",
       "policies",
-      "guide_username"
+      "guide_username",
+      "guide_email",
+      "guide_id"
     ]) {
       if (!newtour[field]) {
         logger.error(`${field} is required`);
@@ -77,17 +110,50 @@ tourRouter
 
     if (error) return res.status(400).send(error);
 
-    tourService
-      .getByGuideUsername(req.app.get("db"), newtour.guide_username)
+    // tourService
+    //   .getByUsername(req.app.get("db"), newtour.guide_username)
+    //   .then(guide => {
+    //     const guideId = guide.id;
+    //     newtour.guide_id = guideId;
+    //     return newtour;
+    //   })
+    //  guideService
+    //   .getByGuideEmail(req.app.get("db"), newtour.guide_email)
+    //   .then(guide => {
+    //     console.log("empty guide: ", guide)
+    //         if(guide === undefined){
+    //           guideService
+    //           .insertGuide(req.app.get("db"), newGuide)
+    //           .then(guide => {
+    //             const guideId = guide.id;
+    //             newtour.guide_id = guideId;
+    //             console.log("new guide id:", newtour.guide_id)
+               
+    //           })
+    //           return newtour;
+    //         }else{
+    //           const guideId = guide.id;
+    //             newtour.guide_id = guideId;
+    //             console.log("new tour in guide then: ", newtour)
+
+    //             return newtour;
+    //         }
+    //             return newtour;
+
+    //       })
+      guideService
+      .insertGuide(req.app.get("db"), newGuide)
       .then(guide => {
-        const guideId = guide.id;
-        newtour.guide_id = guideId;
-        return newtour;
-      })
-      .then(newtour => {
+            const guideId = guide.id;
+            newtour.guide_id = guideId;
+            return newtour;
+          })
+      .then(tourToBeAdded => {
+        console.log("new tour:", tourToBeAdded)
         tourService
-          .insertTour(req.app.get("db"), newtour)
+          .insertTour(req.app.get("db"), tourToBeAdded)
           .then(tour => {
+            console.log("tour:", tour)
             logger.info(`tour with id ${tour.id} created.`);
             res
               .status(201)

@@ -10,6 +10,7 @@ const jwt = require("jsonwebtoken");
 
 const serializeuser = user => ({
   id: user.id,
+  username: xss(user.username),
   f_name: xss(user.f_name),
   l_name: xss(user.l_name),
   email: xss(user.email),
@@ -28,10 +29,10 @@ userRouter
       .catch(next);
   })
   .post(bodyParser, (req, res, next) => {
-    const { f_name, l_name, email, password } = req.body;
-    const newUser = { f_name, l_name, email, password };
+    const { f_name, l_name, email, username, password } = req.body;
+    const newUser = { f_name, l_name, email, username, password };
 
-    for (const field of ["f_name", "l_name", "email", "password"]) {
+    for (const field of ["f_name", "l_name", "email", "username", "password"]) {
       if (!newUser[field]) {
         logger.error(`${field} is required`);
         return res.status(400).send({

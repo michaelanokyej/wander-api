@@ -3,9 +3,9 @@ TRUNCATE  users, tours RESTART IDENTITY CASCADE;
 
 -- insert some users
 INSERT INTO users
-  (f_name, l_name, email, password)
+  (f_name, l_name, userName, email, password)
   VALUES
-    ('Michael', 'Anokye', 'michaelanokyej@yahoo.com', 'wanderpassword123');
+    ('Michael', 'Anokye', 'michaelanokyej', 'michaelanokyej@yahoo.com', 'wanderpassword123');
 
 -- insert some tours
 INSERT INTO tours

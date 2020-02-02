@@ -10,9 +10,10 @@ const jwt = require("jsonwebtoken");
 
 const serializeauth = auth => ({
   id: auth.id,
+  useremail: xss(auth.email),
   firstName: xss(auth.f_name),
   lastName: xss(auth.l_name),
-  userName: xss(auth.email)
+  userName: xss(auth.username)
 });
 
 authRouter
@@ -32,7 +33,7 @@ authRouter
     }
 
     userService
-      .getByGuideUsername(req.app.get("db"), user.userName)
+      .getByUsername(req.app.get("db"), user.userName)
       .then(verifiedUser => {
         res.json(serializeauth(verifiedUser));
       })
@@ -60,16 +61,20 @@ authRouter
     if (error) return res.status(400).send(error);
 
     userService
-      .getByGuideUsername(req.app.get("db"), user.email)
+      .getByUserEmail(req.app.get("db"), user.email)
       .then(verifiedUser => {
         if (verifiedUser.password !== user.password) {
           res.send("Err: User not found, please verify password");
+        } else {
+          return verifiedUser;
         }
       })
       .then(user => {
+        console.log(user);
         jwt.sign({ user }, "secretkey", (err, token) => {
           res.json({
-            token
+            token,
+            ...user
           });
         });
       })

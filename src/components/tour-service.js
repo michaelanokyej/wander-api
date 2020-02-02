@@ -11,11 +11,11 @@ const tourService = {
         return rows[0];
       });
   },
-  getByGuideUsername(knex, GuideUsername) {
+  getByUsername(knex, GuideUsername) {
     return knex
       .from("users")
       .select("*")
-      .where("email", GuideUsername)
+      .where("username", GuideUsername)
       .first();
   },
   getById(knex, id) {
