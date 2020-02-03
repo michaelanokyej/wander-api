@@ -149,11 +149,9 @@ tourRouter
             return newtour;
           })
       .then(tourToBeAdded => {
-        console.log("new tour:", tourToBeAdded)
         tourService
           .insertTour(req.app.get("db"), tourToBeAdded)
           .then(tour => {
-            console.log("tour:", tour)
             logger.info(`tour with id ${tour.id} created.`);
             res
               .status(201)

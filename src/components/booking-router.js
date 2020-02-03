@@ -73,7 +73,6 @@ bookingRouter
         bookingService
           .insertBooking(req.app.get("db"), newBooking)
           .then(booking => {
-            console.log("booking:", booking)
             logger.info(`booking with id ${booking.id} created.`);
             res
               .status(201)

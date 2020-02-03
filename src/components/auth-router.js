@@ -70,7 +70,6 @@ authRouter
         }
       })
       .then(user => {
-        console.log(user);
         jwt.sign({ user }, "secretkey", (err, token) => {
           res.json({
             token,
