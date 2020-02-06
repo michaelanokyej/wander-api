@@ -23,25 +23,6 @@ const serializetour = tour => ({
   posted: xss(tour.posted)
 });
 
-// let newtour = {
-//   name: "",
-//   city: "",
-//   state: "",
-//   img: "",
-//   description: "",
-//   max_tourists: "",
-//   policies: "",
-//   guide_username: "",
-//   guide_email: "",
-//   guide_id: ""
-// };
-
-// let newGuide = {
-//   username: "",
-//   email: "",
-//   primaryuserid: ""
-// }
-
 tourRouter
   .route("/")
 
@@ -84,7 +65,7 @@ tourRouter
       username: guide_username,
       email: guide_email,
       primaryuserid: guide_id
-    }
+    };
 
     for (const field of [
       "name",
@@ -110,44 +91,22 @@ tourRouter
 
     if (error) return res.status(400).send(error);
 
-    // tourService
-    //   .getByUsername(req.app.get("db"), newtour.guide_username)
-    //   .then(guide => {
-    //     const guideId = guide.id;
-    //     newtour.guide_id = guideId;
-    //     return newtour;
-    //   })
-    //  guideService
-    //   .getByGuideEmail(req.app.get("db"), newtour.guide_email)
-    //   .then(guide => {
-    //     console.log("empty guide: ", guide)
-    //         if(guide === undefined){
-    //           guideService
-    //           .insertGuide(req.app.get("db"), newGuide)
-    //           .then(guide => {
-    //             const guideId = guide.id;
-    //             newtour.guide_id = guideId;
-    //             console.log("new guide id:", newtour.guide_id)
-               
-    //           })
-    //           return newtour;
-    //         }else{
-    //           const guideId = guide.id;
-    //             newtour.guide_id = guideId;
-    //             console.log("new tour in guide then: ", newtour)
-
-    //             return newtour;
-    //         }
-    //             return newtour;
-
-    //       })
-      guideService
-      .insertGuide(req.app.get("db"), newGuide)
+    guideService
+      .getByGuideEmail(req.app.get("db"), newtour.guide_email)
       .then(guide => {
+        if (guide === undefined) {
+          guideService.insertGuide(req.app.get("db"), newGuide).then(guide => {
             const guideId = guide.id;
             newtour.guide_id = guideId;
-            return newtour;
-          })
+          });
+          return newtour;
+        } else {
+          const guideId = guide.id;
+          newtour.guide_id = guideId;
+
+          return newtour;
+        }
+      })
       .then(tourToBeAdded => {
         tourService
           .insertTour(req.app.get("db"), tourToBeAdded)

@@ -54,7 +54,7 @@ describe(`Users Endpoints`, function () {
                 const userId = 123456
                 return supertest(app)
                     .get(`/api/users/${userId}`)
-                    .expect(404, { error: { message: `User doesn't exist` } });
+                    .expect(404);
             })
         })
 
@@ -79,7 +79,7 @@ describe(`Users Endpoints`, function () {
     })
 
     describe('POST /api/users', () => {
-        it(`creates a folder, responding with 201 and the new folder`, () => {
+        it(`creates a user, responding with 201 and the new user`, () => {
             const newUser = {
               username: "test4user",
               f_name: "test4",
@@ -105,9 +105,14 @@ describe(`Users Endpoints`, function () {
         it(`responds with 400 and an error message when the 'username' is missing`, () => {
             return supertest(app)
                 .post('/api/users')
-                .send({})
+                .send({
+                    f_name: "michael",
+                    l_name: "Anokye",
+                    password: "pass",
+                    email: "manokye@gmail.com"
+                })
                 .expect(400, {
-                    error: { message: `Missing 'username' in request body` }
+                    error: { message: "'username' is required" }
                 })
         })
     })

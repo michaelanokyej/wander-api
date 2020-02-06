@@ -27,7 +27,7 @@ authRouter
       if (!user[field]) {
         logger.error(`${field} is required`);
         return res.status(400).send({
-          error: { message: `'${field}' is required` }
+          error: { message: `${field} is required` }
         });
       }
     }
@@ -51,14 +51,16 @@ authRouter
       if (!user[field]) {
         logger.error(`${field} is required`);
         return res.status(400).send({
-          error: { message: `'${field}' is required` }
+          error: { message: `${field} is required` }
         });
       }
     }
 
     const error = getAuthValidationError(user);
 
-    if (error) return res.status(400).send(error);
+    // if (error) return res.status(400).send(error);
+    if (error) return res.status(400);
+
 
     userService
       .getByUserEmail(req.app.get("db"), user.email)

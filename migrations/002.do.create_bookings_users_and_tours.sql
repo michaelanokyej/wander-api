@@ -1,8 +1,9 @@
 -- DROP the tables and constraints
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS guides;
 DROP TABLE IF EXISTS tours;
 DROP TABLE IF EXISTS bookings;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS guides;
+
 
 
 -- create the users table, it depends on no other

@@ -9,21 +9,21 @@ function getAuthValidationError({ email, password }) {
     logger.error(`No email supplied`);
     return {
       error: {
-        message: `'Email must be entered`
+        message: `Email must be entered`
       }
     };
   } else if (!include_flag) {
     logger.error(`Invalid email '${email}' supplied`);
     return {
       error: {
-        message: `'A valid email' must be entered`
+        message: `A valid email must be entered`
       }
     };
   } else if (!password) {
     logger.error(`Invalid first name '${password}' supplied`);
     return {
       error: {
-        message: `'password' must be entered`
+        message: `password must be entered`
       }
     };
   }

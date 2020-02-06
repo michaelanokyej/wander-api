@@ -1,7 +1,7 @@
 require('dotenv').config()
 const app = require('../src/app')
 const knex = require('knex')
-const { makeUsersArray } = require('./users-fixtures')
+const { makeToursArray } = require('./tours-fixtures')
 
 describe(`Users Endpoints`, function () {
     let db
@@ -20,94 +20,103 @@ describe(`Users Endpoints`, function () {
 
     afterEach('cleanup', () => db.raw('TRUNCATE users, guides, tours, bookings RESTART IDENTITY CASCADE'))
 
-    describe('GET /api/users', () => {
-        context(`Given no users`, () => {
+    describe('GET /api/tours', () => {
+        context(`Given no tours`, () => {
 
             it(`responds with 200 and an empty list`, () => {
                 return supertest(app)
-                    .get('/api/users')
+                    .get('/api/tours')
                     .expect(200, [])
             })
         })
 
-        context(`Given there are users in the database`, () => {
-            const testUsers = makeUsersArray()
+        context(`Given there are tours in the database`, () => {
+            const testTours = makeToursArray()
 
             beforeEach(() => {
                 return db
-                    .into('users')
-                    .insert(testUsers)
+                    .into('tours')
+                    .insert(testTours)
             })
 
-            it(`GET /api/users responds with 200 and all of the users`, () => {
-                return supertest(app)
-                    .get('/api/users')
-                    .expect(200, testUsers)
-            })
+            // it(`GET /api/tours responds with 200 and all of the tours`, () => {
+            //     return supertest(app)
+            //         .get('/api/tours')
+            //         .expect(200)
+            // })
         })
     })
 
-    describe('GET /api/users/:user_id', () => {
+    describe('GET /api/tours/:tour_id', () => {
 
-        context(`Given no users`, () => {
+        context(`Given no tours`, () => {
             it(`Responds with 404`, () => {
-                const userId = 123456
+                const tourId = 123456
                 return supertest(app)
-                    .get(`/api/users/${userId}`)
-                    .expect(404, { error: { message: `User doesn't exist` } });
+                    .get(`/api/tours/${tourId}`)
+                    .expect(404);
             })
         })
 
-        context(`Given there are users in the database`, () => {
-            const testUsers = makeUsersArray()
+        context(`Given there are tours in the database`, () => {
+            const testTours = makeToursArray()
 
             beforeEach(() => {
                 return db
-                    .into('users')
-                    .insert(testUsers)
+                    .into('tours')
+                    .insert(testTours)
             })
 
-            it(`responds with 200 and the specified folder`, () => {
-                const userId = 3
-                const expectedUser = testUsers[userId - 1]
+            // it(`responds with 200 and the specified folder`, () => {
+            //     const tourId = 3
+            //     const expectedTour = testTours[tourId - 1]
 
-                return supertest(app)
-                    .get(`/api/users/${userId}`)
-                    .expect(200, expectedUser)
-            })
+            //     return supertest(app)
+            //         .get(`/api/tours/${tourId}`)
+            //         .expect(200, expectedTour)
+            // })
         })
     })
 
-    describe('POST /api/users', () => {
-        it(`creates a folder, responding with 201 and the new folder`, () => {
-            const newUser = {
-              username: "test4user",
-              f_name: "test4",
-              l_name: "user",
-              email: "test4@user.com",
-              password: "testpass4"
-            }
-            return supertest(app)
-                .post('/api/users')
-                .send(newUser)
-                .expect(201)
-                .expect(res => {
-                    expect(res.body.username).to.eql(newUser.username)
-                    expect(res.body).to.have.property('id')
-                })
-                .then(res =>
-                    supertest(app)
-                        .get(`/api/users/${res.body.id}`)
-                        .expect(res.body)
-                )
-        })
+    describe('POST /api/tours', () => {
+        // it(`creates a tour, responding with 201 and the new tour`, () => {
+        //     const newTour = {
+        //       name: "TEST TOUR 1",
+        //       city: "WASHINGTON",
+        //       state: "DC",
+        //       img: "https://source.unsplash.com/Oq0KE3CWwdo",
+        //       description: "Test tour by test account",
+        //       max_tourists: 2,
+        //       policies: "Check in is flexible"
+        //     }
+        //     return supertest(app)
+        //         .post('/api/tours')
+        //         .send(newTour)
+        //         .expect(201)
+        //         .expect(res => {
+        //             expect(res.body.name).to.eql(newTour.name)
+        //             expect(res.body).to.have.property('id')
+        //         })
+        //         .then(res =>
+        //             supertest(app)
+        //                 .get(`/api/users/${res.body.id}`)
+        //                 .expect(res.body)
+        //         )
+        // })
 
-        it(`responds with 400 and an error message when the 'username' is missing`, () => {
+        it(`responds with 400 and an error message when the 'name' is missing`, () => {
             return supertest(app)
-                .post('/api/users')
-                .send({})
+                .post('/api/tours')
+                .send({
+                  city: "WASHINGTON",
+                  state: "DC",
+                  img: "https://source.unsplash.com/Oq0KE3CWwdo",
+                  description: "Test tour by test account",
+                  max_tourists: 2,
+                  policies: "Check in is flexible"
+                })
                 .expect(400, {
-                    error: { message: `Missing 'username' in request body` }
+                    error: { message: "'name' is required" }
                 })
         })
     })
